@@ -16,13 +16,13 @@ SC_HANDLE schSCManager;
 SC_HANDLE schService;
 
 
+
 int main()
 {
-
 string AnimationText = "Switch Tablet Driver\n\n";
 int x = 0;
 
-const string process[5] = {"Wacom_Tablet.exe", "WacomDesktopCenter.exe","Wacom_Tablet.exe"};
+const string process[3] = {"Wacom_Tablet.exe", "WacomDesktopCenter.exe","Wacom_Tablet.exe"};
 const string szSvcName[2] = {"WTabletServicePro","WTabletServiceCon"};
 BannerAnimation(AnimationText,x);
 
@@ -69,19 +69,13 @@ bool ProcessController(const string process[], int i) {
             //chiusura processo
             cout<<"|Chiusura in corso..."<<endl<<endl;
             HANDLE hProcess = OpenProcess(PROCESS_QUERY_INFORMATION|PROCESS_VM_READ|PROCESS_TERMINATE,FALSE,entry.th32ProcessID); 
-     		goto stop_cleanup;
-
+     		CloseHandle(snapshot);
             return true;
         }
     } while (Process32Next(snapshot, &entry));
 
     CloseHandle(snapshot);
 
-
-
-    stop_cleanup:
-        CloseServiceHandle(schService); 
-        CloseServiceHandle(schSCManager);   
     return false;
 
 
@@ -434,7 +428,7 @@ VOID __stdcall DoStopSvc(const string szSvcName[],int j)
 
     // If the service is running, dependencies must be stopped first.
 
-    StopDependentServices();
+    /* StopDependentServices(); */
 
     // Send a stop code to the service.
 
@@ -479,7 +473,7 @@ VOID __stdcall DoStopSvc(const string szSvcName[],int j)
 
 }
 
-BOOL __stdcall StopDependentServices()
+/* BOOL __stdcall StopDependentServices()
 {
     DWORD i;
     DWORD dwBytesNeeded;
@@ -572,4 +566,4 @@ BOOL __stdcall StopDependentServices()
     }
      
     return TRUE;
-}
+} */
