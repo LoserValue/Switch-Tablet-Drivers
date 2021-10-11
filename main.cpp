@@ -16,7 +16,6 @@ SC_HANDLE schSCManager;
 SC_HANDLE schService;
 
 
-
 int main()
 {
 
