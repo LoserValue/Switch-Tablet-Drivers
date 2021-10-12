@@ -472,7 +472,7 @@ VOID __stdcall DoStopSvc(const string szSvcName[],int j)
 
 }
 
-/* BOOL __stdcall StopDependentServices()
+BOOL __stdcall StopDependentServices()
 {
     DWORD i;
     DWORD dwBytesNeeded;
@@ -506,6 +506,7 @@ VOID __stdcall DoStopSvc(const string szSvcName[],int j)
         if ( !lpDependencies )
             return FALSE;
 
+        
         __try {
             // Enumerate the dependencies.
             if ( !EnumDependentServices( schService, SERVICE_ACTIVE, 
@@ -565,4 +566,4 @@ VOID __stdcall DoStopSvc(const string szSvcName[],int j)
     }
      
     return TRUE;
-} */
+} 
