@@ -17,7 +17,7 @@
     SC_HANDLE schService;
 
 
-    int main()
+    null main()
     {
     string AnimationText = "Switch Tablet Driver\n\n";
     int x = 0;
@@ -43,7 +43,6 @@
         if(i==2)
             Sleep(1000);
     }
-    return 0;
     }
 
 
