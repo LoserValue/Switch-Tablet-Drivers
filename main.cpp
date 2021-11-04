@@ -1,55 +1,56 @@
-    #include<iostream>
-    #include<string>
-    #include<windows.h>
-    #include<tlhelp32.h>
-    #include<tchar.h>
+#include<iostream>
+#include<string>
+#include<windows.h>
+#include<tlhelp32.h>
+#include<tchar.h>
 
 
-    using namespace std;
+using namespace std;
 
-    //Dichiarazione funzioni
-    void __stdcall DoStartSvc(const string szSvcName[],int j);
-    VOID __stdcall DoStopSvc(const string szSvcName[],int j);
-
-    void StartService();
-    void BannerAnimation(string AnimationText, int x);
-    bool ProcessController(const string process[], int i);
-    const string process[5] = {"Wacom_Tablet.exe", "Pen_Tablet.exe","WacomDesktopCenter.exe","Wacom_Tablet.exe","Pen_Tablet.exe"};
-    const string szSvcName[2] = {"WTabletServicePro","WTabletServiceCon"};
-    int j;
-    SC_HANDLE SCManager = OpenSCManager(NULL, NULL, SC_MANAGER_ALL_ACCESS);
-    SC_HANDLE SHandle = OpenService(SCManager, szSvcName[j].c_str(), SC_MANAGER_ALL_ACCESS);
+//Dichiarazione funzioni
+void BannerAnimation(string AnimationText, int x);
+void ProcessController(string process[], int i);
+void ServiceManagement( string szSvcName[],int j);
+string process[] = {"Wacom_Tablet.exe", "Pen_Tablet.exe","WacomDesktopCenter.exe","Wacom_Tablet.exe","Pen_Tablet.exe"};
+string szSvcName[] =  {"WTabletServicePro","WTabletServiceCon"};
 
 
 
-    int main()
-    {
+
+
+int main()
+{
 
     string AnimationText = "Switch Tablet Driver\n\n";
-    int x = 0;
-
+    int x=0;
+    int j=0;
     BannerAnimation(AnimationText,x);
-
+    
     for(int i=0;i<5;i++){
         ProcessController(process,i);
         if (i==1){
-            j=1;
-            StartService();    
+            while(j<2){
+                ServiceManagement(szSvcName,j);    
+                j++;
+            }
         }
-    }
-    }
+        else if(i==2){Sleep(1000);}
 
-    void BannerAnimation(string AnimationText, int x)
+    }
+    return 0;
+}
+
+void BannerAnimation(string AnimationText, int x)
     {
     while ( AnimationText[x] != '\0')
     {
         cout << AnimationText[x];
-        Sleep(30);
+        Sleep(10);
         x++;
     };
-    }
+}
 
-    bool ProcessController(const string process[], int i) {
+    void ProcessController(string process[], int i) {
         PROCESSENTRY32 entry;
         entry.dwSize = sizeof(PROCESSENTRY32);
 
@@ -57,7 +58,6 @@
 
         if (!Process32First(snapshot, &entry)) {
             CloseHandle(snapshot);
-            return false;
         }
         
         do {
@@ -65,54 +65,55 @@
                 cout <<"|" <<process[i]<< " in esecuzione"<< endl;
                 //chiusura processo
                 cout<<"|Chiusura in corso..."<<endl<<endl;
-                HANDLE hProcess = OpenProcess(PROCESS_QUERY_INFORMATION|PROCESS_VM_READ|PROCESS_TERMINATE,FALSE,entry.th32ProcessID); 
+                HANDLE hProcess = OpenProcess(PROCESS_TERMINATE,FALSE,entry.th32ProcessID); 
                 TerminateProcess(hProcess,0);
-                CloseHandle(snapshot);
-                return true;
+                CloseHandle(hProcess);
             }
         } while (Process32Next(snapshot, &entry));
 
         CloseHandle(snapshot);
 
-        return false;
-
-
     }
 
-    void StartService(){
+
+
+void ServiceManagement(string szSvcName[],int j){
+    
         SERVICE_STATUS Status;
+
+        SC_HANDLE SCManager = OpenSCManager(NULL, NULL, SC_MANAGER_ALL_ACCESS);
+        SC_HANDLE SHandle = OpenService(SCManager, szSvcName[j].c_str(), SC_MANAGER_ALL_ACCESS);
+
         if(SHandle == NULL)
         {
-            std::cout << "ERROR " << GetLastError() << std::endl;
+            cout << "ERROR " << GetLastError() << endl;
         }
         
-        if(!ControlService(SHandle, SERVICE_CONTROL_STOP, &Status))
+        else if(!ControlService(SHandle, SERVICE_CONTROL_STOP, &Status))
         {
-            std::cout << "FAILED TO SEND STOP SERVICE COMMAND: " << GetLastError();
+            cout << "FAILED TO SEND STOP SERVICE COMMAND: " << GetLastError()<<endl;
         }
         else
         {
-            std::cout << "Service Stop Command Sent\n";
+            cout << "Service Stop Command Sent"<<endl;
         }
         
         do
         {
             QueryServiceStatus(SHandle, &Status);
-            std::cout << "Checking Service Status...\n";
+            // std::cout << "Checking Service Status...\n";
         }while(Status.dwCurrentState != SERVICE_STOPPED);   
 
         if(!StartService(SHandle, 0, NULL))
         {
-            std::cout << "Service Did Not Start Up Again: " << GetLastError() << std::endl;
+            cout << "Service Did Not Start Up Again: " << GetLastError() << endl;
         }
         else
         {
-            std::cout << "Service Started\n";
+            cout << "Service Started"<<endl;
         }
         
-        cin.get();
         
         CloseServiceHandle(SCManager);
         CloseServiceHandle(SHandle);
-       
-        }
+}
