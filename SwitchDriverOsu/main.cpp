@@ -50,7 +50,7 @@ void BannerAnimation(string AnimationText, int x)
     };
 }
 
-    void ProcessController(string process[], int i) {
+void ProcessController(string process[], int i) {
         PROCESSENTRY32 entry;
         entry.dwSize = sizeof(PROCESSENTRY32);
 
@@ -73,7 +73,7 @@ void BannerAnimation(string AnimationText, int x)
 
         CloseHandle(snapshot);
 
-    }
+}
 
 
 
