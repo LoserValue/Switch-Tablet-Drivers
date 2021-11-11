@@ -1,7 +1,6 @@
 *.exe
 .vscode/
 
-
 *.code-workspace
 .history/
 

@@ -1,46 +1,49 @@
-#include<iostream>
-#include<string>
-#include<windows.h>
-#include<tlhelp32.h>
-#include<tchar.h>
+#include    <iostream>
+#include    <string>
+#define WIN32_LEAN_AND_MEAN
+#include    <windows.h>
+#include    <tlhelp32.h>
+#include    <filesystem>
+#include    <algorithm>
+#include    "tinyxml2.h"
 
-
+using namespace tinyxml2;
 using namespace std;
+namespace fs = std::filesystem;
+
+
 
 //Dichiarazione funzioni
 void BannerAnimation(string AnimationText, int x);
 void ProcessController(string process[], int i);
-void ServiceManagement(string szSvcName[],int j);
-void ServiceStart(string szSvcName[],int j);
+void ServiceManagement(string szSvcName[], int j);
+void ServiceStart(string szSvcName[], int j);
 bool ProcessChecker(string nameProcess);
 
-
-string process[] = {"Wacom_Tablet.exe", "Pen_Tablet.exe","WacomDesktopCenter.exe","Wacom_Tablet.exe","Pen_Tablet.exe"};
-string szSvcName[] =  {"WTabletServicePro","WTabletServiceCon"};
-
-
+string process[] = {"Wacom_Tablet.exe", "Pen_Tablet.exe", "WacomDesktopCenter.exe", "Wacom_Tablet.exe", "Pen_Tablet.exe"};
+string szSvcName[] = {"WTabletServicePro", "WTabletServiceCon"};
 
 int main()
 {
+
+        SetConsoleOutputCP(CP_UTF8);
+        XMLDocument doc;
         string AnimationText = "Switch Tablet Driver\n\n";
         int x=0;
-        char ris;
+        string ris;
         BannerAnimation(AnimationText,x);
-
+        
         if(!ProcessChecker("Wacom_Tablet.exe"))
         {
             cout << "Driver wacom non rilevati. Vuoi utilizzarli? (y/n)"<< endl;
             cin >> ris;
-            ris =  tolower(ris);
-            if(ris == 'y'){
+            transform(ris.begin(), ris.end(), ris.begin(), ::tolower);
+            if(ris == "y"){
                 for(int j=0;j<2;j++){
                         ServiceManagement(szSvcName,j);
                 }
-                
             }
-            
         }  
-
         else {
             cout << "Driver wacom rilevati. Inizio procedura di chiusura..."<< endl;
             for(int i=0;i<5;i++){
@@ -55,7 +58,6 @@ int main()
         }        
         return 0;
 }
-
 void BannerAnimation(string AnimationText, int x)
 {
     while(AnimationText[x] != '\0')
@@ -65,7 +67,6 @@ void BannerAnimation(string AnimationText, int x)
         x++;
     }
 }
-
 bool ProcessChecker(string ProcessName){
 
         PROCESSENTRY32 entry;
@@ -87,9 +88,6 @@ bool ProcessChecker(string ProcessName){
         CloseHandle(snapshot);
         return false;
 }    
-
-
-
 void ProcessController(string process[], int i) {
         PROCESSENTRY32 entry;
         entry.dwSize = sizeof(PROCESSENTRY32);
@@ -116,9 +114,6 @@ void ProcessController(string process[], int i) {
         CloseHandle(snapshot);
 
 }
-
-
-
 void ServiceManagement(string szSvcName[],int j){
     
         SERVICE_STATUS Status;
@@ -154,7 +149,6 @@ void ServiceManagement(string szSvcName[],int j){
         {
             cout <<"|" << "Service Started successfully"<<endl;
         }
-        
         
         CloseServiceHandle(SCManager);
         CloseServiceHandle(SHandle);
