@@ -3,17 +3,17 @@
         {
             "type": "cppbuild",
             "label": "C/C++: g++.exe compila il file attivo",
-            "command": "C:/Program Files (x86)/mingw-w64/i686-8.1.0-posix-dwarf-rt_v6-rev0/mingw32/bin/g++.exe",
+            "command": "C:\\msys64\\mingw64\\bin\\g++.exe",
             "args": [
                 "--std",
-				"c++2a",
+				"c++17",
                 "-g",
                 "${fileDirname}\\*.cpp",
                 "-o",
                 "${workspaceFolder}\\${fileBasenameNoExtension}.exe"
             ],
             "options": {
-                "cwd": "C:/Program Files (x86)/mingw-w64/i686-8.1.0-posix-dwarf-rt_v6-rev0/mingw32/bin"
+                "cwd": "${fileDirname}"
             },
             "problemMatcher": [
                 "$gcc"
