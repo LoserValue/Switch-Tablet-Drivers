@@ -1,5 +1,5 @@
 *.exe
-.vscode/
+.vscode/*
 
 
 *.code-workspace
