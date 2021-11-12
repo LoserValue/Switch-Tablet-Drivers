@@ -29,7 +29,7 @@ int main()
         SetConsoleOutputCP(CP_UTF8);
         XMLDocument doc;
         if(!std::filesystem::exists("Data.xml")){
-
+            
             XMLNode * pRoot = doc.NewElement("Root");
             doc.InsertFirstChild(pRoot);
             XMLElement * pElement = doc.NewElement("Value");
