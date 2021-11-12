@@ -1,9 +1,10 @@
 #include    <iostream>
 #include    <string>
-#define WIN32_LEAN_AND_MEAN
+#define     WIN32_LEAN_AND_MEAN
 #include    <windows.h>
 #include    <tlhelp32.h>
 #include    <filesystem>
+#include    <fstream>
 #include    <algorithm>
 #include    "tinyxml2.h"
 
@@ -25,9 +26,22 @@ string szSvcName[] = {"WTabletServicePro", "WTabletServiceCon"};
 
 int main()
 {
-
         SetConsoleOutputCP(CP_UTF8);
         XMLDocument doc;
+        if(!std::filesystem::exists("Data.xml")){
+
+            XMLNode * pRoot = doc.NewElement("Root");
+            doc.InsertFirstChild(pRoot);
+            XMLElement * pElement = doc.NewElement("Value");
+            pElement ->SetAttribute("isFirstRun",1);
+            pRoot->InsertEndChild(pElement);
+            XMLError eResult = doc.SaveFile("Data.xml");
+        }
+        else{
+            doc.LoadFile("Data.xml");
+            cout << setw(0);
+            
+        }
         string AnimationText = "Switch Tablet Driver\n\n";
         int x=0;
         string ris;
