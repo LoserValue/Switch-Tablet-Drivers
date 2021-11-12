@@ -21,19 +21,18 @@ void ServiceManagement(string szSvcName[], int j);
 void ServiceStart(string szSvcName[], int j);
 bool ProcessChecker(string nameProcess);
 
-string process[] = {"Wacom_Tablet.exe", "Pen_Tablet.exe", "WacomDesktopCenter.exe", "Wacom_Tablet.exe", "Pen_Tablet.exe"};
-string szSvcName[] = {"WTabletServicePro", "WTabletServiceCon"};
+string process[5] = {"Wacom_Tablet.exe", "Pen_Tablet.exe", "WacomDesktopCenter.exe", "Wacom_Tablet.exe", "Pen_Tablet.exe"};
+string szSvcName[2] = {"WTabletServicePro", "WTabletServiceCon"};
 
 int main()
 {
-        SetConsoleOutputCP(CP_UTF8);
         XMLDocument doc;
         if(!std::filesystem::exists("Data.xml")){
             
             XMLNode * pRoot = doc.NewElement("Root");
             doc.InsertFirstChild(pRoot);
             XMLElement * pElement = doc.NewElement("Value");
-            pElement ->SetAttribute("isFirstRun",1);
+            pElement ->SetAttribute("alreadyRunned",1);
             pRoot->InsertEndChild(pElement);
             XMLError eResult = doc.SaveFile("Data.xml");
         }
@@ -81,7 +80,7 @@ void BannerAnimation(string AnimationText, int x)
         x++;
     }
 }
-bool ProcessChecker(string ProcessName){
+bool ProcessChecker(string Process){
 
         PROCESSENTRY32 entry;
         entry.dwSize = sizeof(PROCESSENTRY32);
@@ -93,7 +92,7 @@ bool ProcessChecker(string ProcessName){
             return false;
         }
         do {
-            if (!strcmp(entry.szExeFile, ProcessName.c_str() )) {
+            if (!strcmp(entry.szExeFile, Process.c_str() )) {
                     CloseHandle(snapshot);
                     return true;
             }
