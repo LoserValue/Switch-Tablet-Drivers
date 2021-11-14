@@ -76,9 +76,12 @@ int main()
             if(ris == "y"){
 
                 string base_filename = path.substr(path.find_last_of("/\\") + 1);
-                if(ProcessChecker(base_filename))
+                if(ProcessChecker(base_filename)){
                         ProcessController(base_filename);  
-
+                }
+                else{
+                    cout << "Driver devocub non trovati."<<endl;
+                }
                 for(int j=0;j<2;j++){
                         ServiceManagement(szSvcName,j);
                 }
