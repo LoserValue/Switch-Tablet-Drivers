@@ -18,10 +18,11 @@ namespace fs = std::filesystem;
 
 //Dichiarazione funzioni
 void BannerAnimation(string AnimationText, int x);
-void ProcessController(string process[], int i);
+void ProcessController(string ProcessName);
 void ServiceManagement(string szSvcName[], int j);
 void ServiceStart(string szSvcName[], int j);
 bool ProcessChecker(string nameProcess);
+void ProcessStartup(string pathProcess);
 
 string process[5] = {"Wacom_Tablet.exe", "Pen_Tablet.exe", "WacomDesktopCenter.exe", "Wacom_Tablet.exe", "Pen_Tablet.exe"};
 string szSvcName[2] = {"WTabletServicePro", "WTabletServiceCon"};
@@ -71,23 +72,33 @@ int main()
             cout << "Driver wacom non rilevati. Vuoi utilizzarli? (y/n)"<< endl;
             cin >> ris;
             transform(ris.begin(), ris.end(), ris.begin(), ::tolower);
+
             if(ris == "y"){
+
+                string base_filename = path.substr(path.find_last_of("/\\") + 1);
+                if(ProcessChecker(base_filename))
+                        ProcessController(base_filename);  
+
                 for(int j=0;j<2;j++){
                         ServiceManagement(szSvcName,j);
                 }
+
             }
         }  
         else{
             cout << "Driver wacom rilevati. Inizio procedura di chiusura..."<< endl;
+
             for(int i=0;i<5;i++){
-                    ProcessController(process,i);
-                    if (i==1){
-                            for(int j=0;j<2;j++){
-                                    ServiceManagement(szSvcName,j);    
-                            }
+                ProcessController(process[i]);
+                if (i==1){
+                    for(int j=0;j<2;j++){
+                            ServiceManagement(szSvcName,j);    
                     }
+                }
                 else if(i==2){Sleep(1000);}
-            } 
+            }
+            ProcessStartup(path);
+
         }        
         return 0;
 }
@@ -120,8 +131,38 @@ bool ProcessChecker(string Process){
         
         CloseHandle(snapshot);
         return false;
-}    
-void ProcessController(string process[], int i) {
+}
+
+void ProcessStartup(string pathProcess){
+    STARTUPINFO si;
+    PROCESS_INFORMATION pi;
+
+    ZeroMemory( &si, sizeof(si) );
+    si.cb = sizeof(si);
+    ZeroMemory( &pi, sizeof(pi) );
+    LPSTR CPath = const_cast<char *>(pathProcess.c_str());
+
+    if( !CreateProcessA( NULL,   // No module name (use command line)
+        CPath,        // Command line
+        NULL,           // Process handle not inheritable
+        NULL,           // Thread handle not inheritable
+        FALSE,          // Set handle inheritance to FALSE
+        0,              // No creation flags
+        NULL,           // Use parent's environment block
+        NULL,           // Use parent's starting directory 
+        &si,            // Pointer to STARTUPINFO structure
+        &pi )           // Pointer to PROCESS_INFORMATION structure
+    ){
+        printf( "CreateProcess failed (%d).\n", GetLastError() );
+        return;
+    }  
+
+    // Close process and thread handles. 
+    CloseHandle( pi.hProcess );
+    CloseHandle( pi.hThread );
+}
+
+void ProcessController(string ProcessName) {
         PROCESSENTRY32 entry;
         entry.dwSize = sizeof(PROCESSENTRY32);
 
@@ -132,9 +173,9 @@ void ProcessController(string process[], int i) {
         }
         
         do {
-            if (!strcmp(entry.szExeFile, process[i].c_str() )) {
+            if (!strcmp(entry.szExeFile, ProcessName.c_str() )) {
                 
-                cout <<endl<<"|" <<process[i]<< " in esecuzione"<< endl;
+                cout <<endl<<"|" <<ProcessName<< " in esecuzione"<< endl;
                 //chiusura processo
                 cout<<"|Chiusura in corso..."<<endl<<endl;
                 HANDLE hProcess = OpenProcess(PROCESS_TERMINATE,FALSE,entry.th32ProcessID); 
