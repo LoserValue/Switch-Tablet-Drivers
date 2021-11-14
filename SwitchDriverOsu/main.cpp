@@ -57,11 +57,11 @@ int main()
 
             xmlDoc.LoadFile("Data.xml");
             
-            XMLText *pElement = xmlDoc.FirstChildElement("Root")->FirstChildElement("AlredyRunned")->ToText();
+            XMLText *pElement = xmlDoc.FirstChildElement("Root")->FirstChildElement("AlredyRunned")->FirstChild()->ToText();
             if (pElement == nullptr) cout << XML_ERROR_FILE_READ_ERROR;
             string iOutInt = pElement->Value();
 
-            pElement = xmlDoc.FirstChildElement("Root")->FirstChildElement("Path")->ToText();
+            pElement = xmlDoc.FirstChildElement("Root")->FirstChildElement("Path")->FirstChild()->ToText();
             if (pElement == nullptr) cout << XML_ERROR_FILE_READ_ERROR;
             path = pElement->Value();       
         }
