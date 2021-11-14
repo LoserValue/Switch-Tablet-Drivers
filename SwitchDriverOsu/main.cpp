@@ -12,7 +12,9 @@ using namespace tinyxml2;
 using namespace std;
 namespace fs = std::filesystem;
 
-
+#ifndef XMLCheckResult
+	#define XMLCheckResult(a_eResult) if (a_eResult != XML_SUCCESS) { printf("Error: %i\n", a_eResult); return a_eResult; }
+#endif
 
 //Dichiarazione funzioni
 void BannerAnimation(string AnimationText, int x);
@@ -26,26 +28,44 @@ string szSvcName[2] = {"WTabletServicePro", "WTabletServiceCon"};
 
 int main()
 {
-        XMLDocument doc;
-        if(!std::filesystem::exists("Data.xml")){
-            
-            XMLNode * pRoot = doc.NewElement("Root");
-            doc.InsertFirstChild(pRoot);
-            XMLElement * pElement = doc.NewElement("Value");
-            pElement ->SetAttribute("alreadyRunned",1);
-            pRoot->InsertEndChild(pElement);
-            XMLError eResult = doc.SaveFile("Data.xml");
-        }
-        else{
-            doc.LoadFile("Data.xml");
-            cout << setw(0);
-            
-        }
         string AnimationText = "Switch Tablet Driver\n\n";
         int x=0;
         string ris;
+        string path;
         BannerAnimation(AnimationText,x);
-        
+    
+        XMLDocument xmlDoc;
+
+        if(!std::filesystem::exists("Data.xml")){
+            
+            cout << "Inserire l'indirizzo dei driver:" << endl;
+            getline(cin,path);
+
+            XMLNode * Root = xmlDoc.NewElement("Root");
+            xmlDoc.InsertFirstChild(Root);
+
+            XMLElement * pElement = xmlDoc.NewElement("AlredyRunned");
+            pElement-> SetText(1);
+            Root->InsertEndChild(pElement);
+
+            pElement = xmlDoc.NewElement("Path");
+            pElement-> SetText(path.c_str());
+            Root->InsertEndChild(pElement);
+            XMLError eResult = xmlDoc.SaveFile("Data.xml");
+        }
+        else{
+            xmlDoc.LoadFile("Data.xml");
+            
+            XMLText *pElement = xmlDoc.FirstChildElement("Root")->FirstChildElement("AlredyRunned")->ToText();
+            if (pElement == nullptr) return XML_ERROR_FILE_READ_ERROR;
+            string iOutInt = pElement->Value();
+
+            pElement = xmlDoc.FirstChildElement("Root")->FirstChildElement("Path")->ToText();
+            if (pElement == nullptr) return XML_ERROR_FILE_READ_ERROR;
+            path = pElement->Value();       
+        }
+
+        cout << path<< endl;
         if(!ProcessChecker("Wacom_Tablet.exe"))
         {
             cout << "Driver wacom non rilevati. Vuoi utilizzarli? (y/n)"<< endl;
@@ -57,7 +77,7 @@ int main()
                 }
             }
         }  
-        else {
+        else{
             cout << "Driver wacom rilevati. Inizio procedura di chiusura..."<< endl;
             for(int i=0;i<5;i++){
                     ProcessController(process,i);
