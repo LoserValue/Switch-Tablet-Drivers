@@ -54,18 +54,18 @@ int main()
             XMLError eResult = xmlDoc.SaveFile("Data.xml");
         }
         else{
+
             xmlDoc.LoadFile("Data.xml");
             
             XMLText *pElement = xmlDoc.FirstChildElement("Root")->FirstChildElement("AlredyRunned")->ToText();
-            if (pElement == nullptr) return XML_ERROR_FILE_READ_ERROR;
+            if (pElement == nullptr) cout << XML_ERROR_FILE_READ_ERROR;
             string iOutInt = pElement->Value();
 
             pElement = xmlDoc.FirstChildElement("Root")->FirstChildElement("Path")->ToText();
-            if (pElement == nullptr) return XML_ERROR_FILE_READ_ERROR;
+            if (pElement == nullptr) cout << XML_ERROR_FILE_READ_ERROR;
             path = pElement->Value();       
         }
 
-        cout << path<< endl;
         if(!ProcessChecker("Wacom_Tablet.exe"))
         {
             cout << "Driver wacom non rilevati. Vuoi utilizzarli? (y/n)"<< endl;

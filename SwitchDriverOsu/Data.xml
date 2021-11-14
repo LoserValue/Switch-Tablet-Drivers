@@ -1,3 +1,4 @@
 <Root>
-    <Value alreadyRunned="1"/>
+    <AlredyRunned>1</AlredyRunned>
+    <Path>C:\Users\kiritovex\Downloads\TabletDriverV0.1.5.5.Devocub.Edition\TabletDriverGUI.exe</Path>
 </Root>
