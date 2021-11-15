@@ -205,6 +205,7 @@ void ServiceManagement(string szSvcName[],int j){
         if(SHandle == NULL)
         {
             cout <<"|" << "ERROR " << GetLastError() << endl;
+            cout << "Administrator rights required."
         }
         
         else if(!ControlService(SHandle, SERVICE_CONTROL_STOP, &Status))
