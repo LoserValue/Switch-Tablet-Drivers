@@ -12,17 +12,19 @@ using namespace tinyxml2;
 using namespace std;
 namespace fs = std::filesystem;
 
+//macro error check for xml files
 #ifndef XMLCheckResult
 	#define XMLCheckResult(a_eResult) if (a_eResult != XML_SUCCESS) { printf("Error: %i\n", a_eResult); return a_eResult; }
 #endif
 
-//Dichiarazione funzioni
+//Function Declaration
 void BannerAnimation(string AnimationText, int x);
 void ProcessController(string ProcessName);
 void ServiceManagement(string szSvcName[], int j);
 void ServiceStart(string szSvcName[], int j);
 bool ProcessChecker(string nameProcess);
 void ProcessStartup(string pathProcess);
+
 
 string process[5] = {"Wacom_Tablet.exe", "Pen_Tablet.exe", "WacomDesktopCenter.exe", "Wacom_Tablet.exe", "Pen_Tablet.exe"};
 string szSvcName[2] = {"WTabletServicePro", "WTabletServiceCon"};
@@ -38,8 +40,8 @@ int main()
         XMLDocument xmlDoc;
 
         if(!std::filesystem::exists("Data.xml")){
-            
-            cout << "Inserire l'indirizzo dei driver:" << endl;
+            //get the address of devocub drivers
+            cout << "Enter the address of the drivers:" << endl;
             getline(cin,path);
 
             XMLNode * Root = xmlDoc.NewElement("Root");
@@ -69,18 +71,15 @@ int main()
 
         if(!ProcessChecker("Wacom_Tablet.exe"))
         {
-            cout << "Driver wacom non rilevati. Vuoi utilizzarli? (y/n)"<< endl;
+            cout << "Wacom driver not detected. Do you want to use them?(y/n)"<< endl;
             cin >> ris;
             transform(ris.begin(), ris.end(), ris.begin(), ::tolower);
 
             if(ris == "y"){
-
+                //Gets the "filename.exe" contained in the path
                 string base_filename = path.substr(path.find_last_of("/\\") + 1);
                 if(ProcessChecker(base_filename)){
                         ProcessController(base_filename);  
-                }
-                else{
-                    cout << "Driver devocub non trovati."<<endl;
                 }
                 for(int j=0;j<2;j++){
                         ServiceManagement(szSvcName,j);
@@ -89,7 +88,7 @@ int main()
             }
         }  
         else{
-            cout << "Driver wacom rilevati. Inizio procedura di chiusura..."<< endl;
+            cout << "Wacom drivers detected. Start of closing procedure..."<< endl;
 
             for(int i=0;i<5;i++){
                 ProcessController(process[i]);
@@ -105,6 +104,7 @@ int main()
         }        
         return 0;
 }
+//banner animation
 void BannerAnimation(string AnimationText, int x)
 {
     while(AnimationText[x] != '\0')
@@ -114,6 +114,7 @@ void BannerAnimation(string AnimationText, int x)
         x++;
     }
 }
+
 bool ProcessChecker(string Process){
 
         PROCESSENTRY32 entry;
@@ -165,6 +166,7 @@ void ProcessStartup(string pathProcess){
     CloseHandle( pi.hThread );
 }
 
+
 void ProcessController(string ProcessName) {
         PROCESSENTRY32 entry;
         entry.dwSize = sizeof(PROCESSENTRY32);
@@ -178,9 +180,9 @@ void ProcessController(string ProcessName) {
         do {
             if (!strcmp(entry.szExeFile, ProcessName.c_str() )) {
                 
-                cout <<endl<<"|" <<ProcessName<< " in esecuzione"<< endl;
+                cout <<endl<<"|" <<ProcessName<< " is running"<< endl;
                 //chiusura processo
-                cout<<"|Chiusura in corso..."<<endl<<endl;
+                cout<<"|Closing..."<<endl<<endl;
                 HANDLE hProcess = OpenProcess(PROCESS_TERMINATE,FALSE,entry.th32ProcessID); 
 
                 TerminateProcess(hProcess,0);
@@ -191,6 +193,8 @@ void ProcessController(string ProcessName) {
         CloseHandle(snapshot);
 
 }
+
+
 void ServiceManagement(string szSvcName[],int j){
     
         SERVICE_STATUS Status;
