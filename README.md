@@ -1,8 +1,8 @@
-# Switch-Driver-Osu-
-A tool to easily switch drivers between wacom and devocub.
+# Switch-Tablet-Drivers
+A tool to easily switch between proprietary and custom drivers.
 
 ## Download
-### https://github.com/kiritovex/Switch-Driver-Osu/releases
+### https://github.com/kiritovex/Switch-Tablet-Drivers/releases
 
 ## Installing
 1) Unzip the tool to a folder(It is recommended to put the exe file inside a folder for any generated files).
