@@ -7,6 +7,8 @@
 #include    <fstream>
 #include    <algorithm>
 #include    "tinyxml2.h"
+#include    "privilages.h"
+
 
 using namespace tinyxml2;
 using namespace std;
@@ -21,7 +23,6 @@ namespace fs = std::filesystem;
 void BannerAnimation(string AnimationText, int x);
 void ProcessController(string ProcessName);
 void ServiceManagement(string szSvcName[], int j);
-void ServiceStart(string szSvcName[], int j);
 bool ProcessChecker(string nameProcess);
 void ProcessStartup(string pathProcess);
 
@@ -30,7 +31,12 @@ string process[5] = {"Wacom_Tablet.exe", "Pen_Tablet.exe", "WacomDesktopCenter.e
 string szSvcName[2] = {"WTabletServicePro", "WTabletServiceCon"};
 
 int main()
-{
+{  
+        HANDLE hToken;
+        if(!OpenProcessToken(GetCurrentProcess(), TOKEN_ADJUST_PRIVILEGES, &hToken)){printf("OpenProcessToken() error %u\n", GetLastError());}
+        LPCTSTR lpszPrivilege = "SeSecurityPrivilege";
+        if(!SetPrivilege(hToken,lpszPrivilege,TRUE)) {Sleep(2000); return 1;}
+
         string AnimationText = "Switch Tablet Driver\n\n";
         int x=0;
         string ris;
@@ -205,7 +211,6 @@ void ServiceManagement(string szSvcName[],int j){
         if(SHandle == NULL)
         {
             cout <<"|" << "ERROR " << GetLastError() << endl;
-            cout << "Administrator rights required.";
         }
         
         else if(!ControlService(SHandle, SERVICE_CONTROL_STOP, &Status))
