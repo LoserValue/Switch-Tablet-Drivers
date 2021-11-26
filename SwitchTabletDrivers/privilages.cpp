@@ -44,7 +44,8 @@ BOOL SetPrivilege(
     if (GetLastError() == ERROR_NOT_ALL_ASSIGNED)
 
     {
-          printf("The token does not have the specified privilege. \n");
+
+          printf("The process does not have the required privileges. \n");
           return FALSE;
     } 
 
