@@ -1,17 +1,13 @@
-#include    <iostream>
-#include    <string>
-#define     WIN32_LEAN_AND_MEAN
-#include    <windows.h>
+#include    "DriversManagement.h"
 #include    <tlhelp32.h>
 #include    <filesystem>
 #include    <fstream>
 #include    <algorithm>
 #include    "tinyxml2.h"
-#include    "privilages.h"
-
 
 using namespace tinyxml2;
 using namespace std;
+using namespace Management;
 namespace fs = std::filesystem;
 
 //macro error check for xml files
@@ -21,11 +17,6 @@ namespace fs = std::filesystem;
 
 //Function Declaration
 void BannerAnimation(string AnimationText, int x);
-void ProcessController(string ProcessName);
-void ServiceManagement(string szSvcName[], int j);
-bool ProcessChecker(string nameProcess);
-void ProcessStartup(string pathProcess);
-
 
 string process[5] = {"Wacom_Tablet.exe", "Pen_Tablet.exe", "WacomDesktopCenter.exe", "Wacom_Tablet.exe", "Pen_Tablet.exe"};
 string szSvcName[2] = {"WTabletServicePro", "WTabletServiceCon"};
@@ -33,16 +24,20 @@ string szSvcName[2] = {"WTabletServicePro", "WTabletServiceCon"};
 int main()
 {  
         HANDLE hToken;
+        Service service;
+        Process processObj;
+
         if(!OpenProcessToken(GetCurrentProcess(), TOKEN_ADJUST_PRIVILEGES, &hToken)){printf("OpenProcessToken() error %u\n", GetLastError());}
         LPCTSTR lpszPrivilege = "SeSecurityPrivilege";
-        if(!SetPrivilege(hToken,lpszPrivilege,TRUE)) {Sleep(2000); return 1;}
+        if(!service.SetPrivilege(hToken,lpszPrivilege,TRUE)) {Sleep(2000); return 1;}
 
         string AnimationText = "Switch Tablet Driver\n\n";
         int x=0;
         string ris;
         string path;
         BannerAnimation(AnimationText,x);
-    
+        
+
         XMLDocument xmlDoc;
 
         if(!std::filesystem::exists("Data.xml")){
@@ -60,7 +55,7 @@ int main()
             pElement = xmlDoc.NewElement("Path");
             pElement-> SetText(path.c_str());
             Root->InsertEndChild(pElement);
-            XMLError eResult = xmlDoc.SaveFile("Data.xml");
+            xmlDoc.SaveFile("Data.xml");
         }
         else{
 
@@ -75,7 +70,7 @@ int main()
             path = pElement->Value();       
         }
 
-        if(!ProcessChecker("Wacom_Tablet.exe"))
+        if(!processObj.ProcessChecker("Wacom_Tablet.exe"))
         {
             cout << "Wacom driver not detected. Do you want to use them?(y/n)"<< endl;
             cin >> ris;
@@ -84,11 +79,11 @@ int main()
             if(ris == "y"){
                 //Gets the "filename.exe" contained in the path
                 string base_filename = path.substr(path.find_last_of("/\\") + 1);
-                if(ProcessChecker(base_filename)){
-                        ProcessController(base_filename);  
+                if(processObj.ProcessChecker(base_filename)){
+                        processObj.ProcessController(base_filename);  
                 }
                 for(int j=0;j<2;j++){
-                        ServiceManagement(szSvcName,j);
+                        service.ServiceManagement(szSvcName,j);
                 }
 
             }
@@ -97,15 +92,15 @@ int main()
             cout << "Wacom drivers detected. Start of closing procedure..."<< endl;
 
             for(int i=0;i<5;i++){
-                ProcessController(process[i]);
+                processObj.ProcessController(process[i]);
                 if (i==1){
                     for(int j=0;j<2;j++){
-                            ServiceManagement(szSvcName,j);    
+                            service.ServiceManagement(szSvcName,j);    
                     }
                 }
                 else if(i==2){Sleep(1000);}
             }
-            ProcessStartup(path);
+            processObj.ProcessStartup(path);
 
         }        
         return 0;
@@ -121,7 +116,7 @@ void BannerAnimation(string AnimationText, int x)
     }
 }
 
-bool ProcessChecker(string Process){
+bool Process::ProcessChecker(string Process){
 
         PROCESSENTRY32 entry;
         entry.dwSize = sizeof(PROCESSENTRY32);
@@ -143,7 +138,7 @@ bool ProcessChecker(string Process){
         return false;
 }
 
-void ProcessStartup(string pathProcess){
+void Process::ProcessStartup(string pathProcess){
     STARTUPINFO si;
     PROCESS_INFORMATION pi;
 
@@ -173,7 +168,7 @@ void ProcessStartup(string pathProcess){
 }
 
 
-void ProcessController(string ProcessName) {
+void Process::ProcessController(string ProcessName) {
         PROCESSENTRY32 entry;
         entry.dwSize = sizeof(PROCESSENTRY32);
 
@@ -201,7 +196,7 @@ void ProcessController(string ProcessName) {
 }
 
 
-void ServiceManagement(string szSvcName[],int j){
+void Service::ServiceManagement(string szSvcName[],int j){
     
         SERVICE_STATUS Status;
 
