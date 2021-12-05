@@ -10,5 +10,5 @@ A tool to easily switch between proprietary and custom drivers.
 3) Enter the address of the drivers you want to use (example: "C:\temp\TabletDriverVx.x.x\TabletDriverGUI.exe").
 
 ### Supported tablets:
-Most of the wacom tablets, it depends on the drivers you will use.
+Most of the wacom tablets, it depends on the drivers you're going to use.
 Other tablets and their drivers will be supported soon.
